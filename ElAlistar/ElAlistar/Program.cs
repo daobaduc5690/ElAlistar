@@ -34,8 +34,7 @@ namespace ElAlistar
             if (!Player.ChampionName.Equals(hero, StringComparison.CurrentCultureIgnoreCase))
                 return;
 
-            Console.WriteLine("Game started");
-            Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v1.0.0.2</font>");
+            Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v1.0.0.3</font>");
 
             #region Spell Data
 
@@ -173,7 +172,6 @@ namespace ElAlistar
             SpellDataInst Qmana = Player.Spellbook.GetSpell(SpellSlot.Q);
             SpellDataInst Wmana = Player.Spellbook.GetSpell(SpellSlot.W);
 
-
             if (_q.IsReady() && _w.IsReady() && Qmana.ManaCost + Wmana.ManaCost <= Player.Mana)
             {
                 _w.CastOnUnit(target);
@@ -226,7 +224,6 @@ namespace ElAlistar
 
         #endregion
 
-
         #region SelfHealing
 
         private static void SelfHealing()
@@ -240,8 +237,6 @@ namespace ElAlistar
             {
                 _e.Cast(Player);
             }
-
-            Console.WriteLine(Player.ManaPercentage());
         }
 
         #endregion
