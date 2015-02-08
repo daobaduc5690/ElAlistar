@@ -34,7 +34,8 @@ namespace ElAlistar
             if (!Player.ChampionName.Equals(hero, StringComparison.CurrentCultureIgnoreCase))
                 return;
 
-            Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v1.0.0.1</font>");
+            Console.WriteLine("Game started");
+            Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v1.0.0.2</font>");
 
             #region Spell Data
 
@@ -78,8 +79,6 @@ namespace ElAlistar
             }
 
             var target = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
-            //if (target == null || !target.IsValid) { return; }
-
             if (Interrupter2.IsCastingInterruptableSpell(target) &&
                 Interrupter2.GetInterruptableTargetData(target).DangerLevel == Interrupter2.DangerLevel.High &&
                 target.IsValidTarget(_w.Range))
@@ -192,6 +191,9 @@ namespace ElAlistar
                 ObjectManager.Player.Distance(target, false) < _w.Range + target.BoundingRadius)
             {
                 _w.CastOnUnit(target, true);
+
+                Drawing.DrawText(
+                    Drawing.Width * 0.44f, Drawing.Height * 0.80f, Color.Red, "Killable with W");
             }
 
             if (_menu.Item("SelfHeal").GetValue<bool>() &&
@@ -229,13 +231,17 @@ namespace ElAlistar
 
         private static void SelfHealing()
         {
+            SpellDataInst Emana = Player.Spellbook.GetSpell(SpellSlot.E);
+            
             if (Player.HasBuff("Recall") || Utility.InFountain(Player)) return;
             if (_menu.Item("SelfHeal").GetValue<bool>() &&
-                (Player.Health / Player.MaxHealth) * 100 <= _menu.Item("SelfHperc").GetValue<Slider>().Value &&
+                (Player.Health / Player.MaxHealth) * 100 <= _menu.Item("SelfHperc").GetValue<Slider>().Value && Player.ManaPercentage() >= _menu.Item("minmanaE").GetValue<Slider>().Value  &&
                 _e.IsReady())
             {
                 _e.Cast(Player);
             }
+
+            Console.WriteLine(Player.ManaPercentage());
         }
 
         #endregion
@@ -248,7 +254,7 @@ namespace ElAlistar
             {
                 if (Player.HasBuff("Recall") || Utility.InFountain(Player)) return;
                 if (_menu.Item("HealAlly").GetValue<bool>() &&
-                    (hero.Health / hero.MaxHealth) * 100 <= _menu.Item("HealAllyHP").GetValue<Slider>().Value &&
+                    (hero.Health / hero.MaxHealth) * 100 <= _menu.Item("HealAllyHP").GetValue<Slider>().Value && Player.ManaPercentage() >= _menu.Item("minmanaE").GetValue<Slider>().Value &&
                     _e.IsReady() &&
                     hero.Distance(Player.ServerPosition) <= _e.Range)
                     _e.Cast(hero);
@@ -319,7 +325,6 @@ namespace ElAlistar
             comboMenu.AddItem(new MenuItem("RCombo", "Use R in combo").SetValue(true));
             comboMenu.AddItem(new MenuItem("UltHP", "Ult when health >= ").SetValue(new Slider(50, 1, 100)));
             comboMenu.AddItem(new MenuItem("rcount", "Use ult in combo if enemies >= ")).SetValue(new Slider(2, 1, 5));
-            //this fucks up the combo, recommend to turn it off till the fix.
             comboMenu.AddItem(new MenuItem("UseIgnite", "Use Ignite in combo when killable").SetValue(true));
             comboMenu.AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
@@ -335,6 +340,7 @@ namespace ElAlistar
 
             healMenu.AddItem(new MenuItem("HealAlly", "Auto heal ally's").SetValue(true));
             healMenu.AddItem(new MenuItem("HealAllyHP", "Heal ally at >= ").SetValue(new Slider(25, 1, 100)));
+            healMenu.AddItem(new MenuItem("minmanaE", "Min % mana for heal")).SetValue(new Slider(55));
 
             //Interupt
             var interruptMenu = _menu.AddSubMenu(new Menu("Interrupt", "I"));
