@@ -12,12 +12,7 @@ namespace ElAlistar
     internal class Program
     {
         private static String hero = "Alistar";
-
-        private static Obj_AI_Hero Player
-        {
-            get { return ObjectManager.Player; }
-        }
-
+        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private static Menu _menu;
         private static Orbwalking.Orbwalker _orbwalker;
         private static Spell _q, _w, _e, _r;
@@ -38,11 +33,10 @@ namespace ElAlistar
         private static void Game_OnGameLoad(EventArgs args)
         {
             if (!Player.ChampionName.Equals(hero, StringComparison.CurrentCultureIgnoreCase))
-            {
                 return;
-            }
 
-            Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v1.0.0.0</font>");
+            Console.WriteLine("Beta");
+            Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v1.0.0.1</font>");
 
             #region Spell Data
 
@@ -206,7 +200,7 @@ namespace ElAlistar
             }
 
             if (_menu.Item("SelfHeal").GetValue<bool>() &&
-                Player.Health / Player.MaxHealth * 100 <= _menu.Item("SelfHperc").GetValue<Slider>().Value &&
+                (Player.Health / Player.MaxHealth) * 100 <= _menu.Item("SelfHperc").GetValue<Slider>().Value &&
                 _e.IsReady())
             {
                 _e.Cast(Player);
@@ -214,7 +208,7 @@ namespace ElAlistar
 
             if (Player.CountEnemiesInRange(_w.Range) >= _menu.Item("rcount").GetValue<Slider>().Value &&
                 _menu.Item("RCombo").GetValue<bool>() &&
-                Player.Health / Player.MaxHealth * 100 <= _menu.Item("UltHP").GetValue<Slider>().Value)
+                (Player.Health / Player.MaxHealth) * 100 <= _menu.Item("UltHP").GetValue<Slider>().Value)
             {
                 _r.Cast();
             }
@@ -230,25 +224,25 @@ namespace ElAlistar
                 _menu.Item("UseIgnite").GetValue<bool>())
             {
                 Player.Spellbook.CastSpell(_ignite, target);
-                Console.WriteLine(target.Health);
             }
         }
 
         #endregion
 
+
         #region SelfHealing
+
 
         private static void SelfHealing()
         {
-            if (Player.HasBuff("Recall") || Utility.InFountain(Player))
-            {
-                return;
-            }
+            Console.WriteLine("self");
+            if (Player.HasBuff("Recall") || Utility.InFountain(Player)) return;
             if (_menu.Item("SelfHeal").GetValue<bool>() &&
-                Player.Health / Player.MaxHealth * 100 <= _menu.Item("SelfHperc").GetValue<Slider>().Value &&
+                (Player.Health / Player.MaxHealth) * 100 <= _menu.Item("SelfHperc").GetValue<Slider>().Value &&
                 _e.IsReady())
             {
                 _e.Cast(Player);
+                Console.WriteLine("yes");
             }
         }
 
@@ -260,16 +254,12 @@ namespace ElAlistar
         {
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsAlly && !h.IsMe))
             {
-                if (Player.HasBuff("Recall") || Utility.InFountain(Player))
-                {
-                    return;
-                }
+                if (Player.HasBuff("Recall") || Utility.InFountain(Player)) return;
                 if (_menu.Item("HealAlly").GetValue<bool>() &&
                     (hero.Health / hero.MaxHealth) * 100 <= _menu.Item("HealAllyHP").GetValue<Slider>().Value &&
-                    _e.IsReady() && hero.Distance(Player.ServerPosition) <= _e.Range)
-                {
+                    _e.IsReady() &&
+                    hero.Distance(Player.ServerPosition) <= _e.Range)
                     _e.Cast(hero);
-                }
             }
         }
 
@@ -335,7 +325,7 @@ namespace ElAlistar
             comboMenu.AddItem(new MenuItem("QCombo", "Use Q in combo").SetValue(true));
             comboMenu.AddItem(new MenuItem("WCombo", "Use W in combo").SetValue(true));
             comboMenu.AddItem(new MenuItem("RCombo", "Use R in combo").SetValue(true));
-            comboMenu.AddItem(new MenuItem("UltHP", "Ult when health %").SetValue(new Slider(50, 1, 100)));
+            comboMenu.AddItem(new MenuItem("UltHP", "Ult when health >= ").SetValue(new Slider(50, 1, 100)));
             comboMenu.AddItem(new MenuItem("rcount", "Use ult in combo if enemies >= ")).SetValue(new Slider(2, 1, 5));
             //this fucks up the combo, recommend to turn it off till the fix.
             comboMenu.AddItem(new MenuItem("UseIgnite", "Use Ignite in combo when killable").SetValue(true));
@@ -349,10 +339,10 @@ namespace ElAlistar
             //self healing
             var healMenu = _menu.AddSubMenu(new Menu("Heal settings", "SH"));
             healMenu.AddItem(new MenuItem("SelfHeal", "Auto heal yourself").SetValue(true));
-            healMenu.AddItem(new MenuItem("SelfHperc", "Self health %").SetValue(new Slider(25, 1, 100)));
+            healMenu.AddItem(new MenuItem("SelfHperc", "Self heal at >= ").SetValue(new Slider(25, 1, 100)));
 
             healMenu.AddItem(new MenuItem("HealAlly", "Auto heal ally's").SetValue(true));
-            healMenu.AddItem(new MenuItem("HealAllyHP", "Ally health %").SetValue(new Slider(25, 1, 100)));
+            healMenu.AddItem(new MenuItem("HealAllyHP", "Heal ally at >= ").SetValue(new Slider(25, 1, 100)));
 
             //Interupt
             var interruptMenu = _menu.AddSubMenu(new Menu("Interrupt", "I"));
