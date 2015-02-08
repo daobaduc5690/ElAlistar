@@ -35,7 +35,6 @@ namespace ElAlistar
             if (!Player.ChampionName.Equals(hero, StringComparison.CurrentCultureIgnoreCase))
                 return;
 
-            Console.WriteLine("Beta");
             Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v1.0.0.1</font>");
 
             #region Spell Data
@@ -80,10 +79,7 @@ namespace ElAlistar
             }
 
             var target = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
-            if (target == null || !target.IsValid)
-            {
-                return;
-            }
+            //if (target == null || !target.IsValid) { return; }
 
             if (Interrupter2.IsCastingInterruptableSpell(target) &&
                 Interrupter2.GetInterruptableTargetData(target).DangerLevel == Interrupter2.DangerLevel.High &&
@@ -232,17 +228,14 @@ namespace ElAlistar
 
         #region SelfHealing
 
-
         private static void SelfHealing()
         {
-            Console.WriteLine("self");
             if (Player.HasBuff("Recall") || Utility.InFountain(Player)) return;
             if (_menu.Item("SelfHeal").GetValue<bool>() &&
                 (Player.Health / Player.MaxHealth) * 100 <= _menu.Item("SelfHperc").GetValue<Slider>().Value &&
                 _e.IsReady())
             {
                 _e.Cast(Player);
-                Console.WriteLine("yes");
             }
         }
 
