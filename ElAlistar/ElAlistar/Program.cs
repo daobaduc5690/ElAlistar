@@ -42,7 +42,7 @@ namespace ElAlistar
                 return;
             }
 
-            Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v0.1</font>");
+            Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v0.0.1</font>");
 
             #region Spell Data
 
