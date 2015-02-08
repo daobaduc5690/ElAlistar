@@ -16,7 +16,6 @@ namespace ElAlistar
         private static Menu _menu;
         private static Orbwalking.Orbwalker _orbwalker;
         private static Spell _q, _w, _e, _r;
-
         private static SpellSlot _ignite;
 
         #region Main
