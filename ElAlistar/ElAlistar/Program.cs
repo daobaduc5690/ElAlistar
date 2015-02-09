@@ -40,8 +40,8 @@ namespace ElAlistar
 
             // set spells
             _q = new Spell(SpellSlot.Q, 365);
-            _e = new Spell(SpellSlot.E, 575);
             _w = new Spell(SpellSlot.W, 650);
+            _e = new Spell(SpellSlot.E, 575);
             _r = new Spell(SpellSlot.R, 0);
 
             // init ignite
