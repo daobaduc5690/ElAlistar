@@ -34,7 +34,7 @@ namespace ElAlistar
             if (!Player.ChampionName.Equals(hero, StringComparison.CurrentCultureIgnoreCase))
                 return;
 
-            Game.PrintChat("<font color='#CC0000'>ElAlistar by jQuery v1.0.0.3</font>");
+            Game.PrintChat("<font color='#CC0000'>Do you like mexican because I'll wrap you in my arms and make you my baerito. ElAlistar by jQuery v1.0.0.4</font>");
 
             #region Spell Data
 
