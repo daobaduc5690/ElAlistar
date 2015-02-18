@@ -34,7 +34,8 @@ namespace ElAlistar
             if (!Player.ChampionName.Equals(hero, StringComparison.CurrentCultureIgnoreCase))
                 return;
 
-            Game.PrintChat("<font color='#CC0000'>Do you like mexican because I'll wrap you in my arms and make you my baerito. ElAlistar by jQuery v1.0.0.4</font>");
+            AddNotification("ElAlistar by jQuery v1.0.0.5");
+            AddNotification("Do you like mexican because I'll wrap you in my arms and make you my baerito.");
 
             #region Spell Data
 
@@ -178,20 +179,13 @@ namespace ElAlistar
                 var comboTime = Math.Max(0, Player.Distance(target) - 500) * 10 / 25 + 25;
                 Utility.DelayAction.Add((int) comboTime, () => _q.Cast());
             }
-            else
-            {
-                Drawing.DrawText(
-                    Drawing.Width * 0.44f, Drawing.Height * 0.80f, Color.Red, "Spells are not ready for QW combo");
-            }
+
 
             // if killable with just W
             if (!_q.IsReady() && _w.IsReady() && _w.IsKillable(target, 1) &&
                 ObjectManager.Player.Distance(target, false) < _w.Range + target.BoundingRadius)
             {
                 _w.CastOnUnit(target, true);
-
-                Drawing.DrawText(
-                    Drawing.Width * 0.44f, Drawing.Height * 0.80f, Color.Red, "Killable with W");
             }
 
             if (_menu.Item("SelfHeal").GetValue<bool>() &&
@@ -349,5 +343,14 @@ namespace ElAlistar
         }
 
         #endregion
+
+
+        /* maybe I should create a new class for this instead of writting it all down in the same damn file, yes maybe. But NO I WONT. */
+        public static void AddNotification(String text)
+        {
+            var notification = new Notification(text, 10000);
+            Notifications.AddNotification(notification);
+        }
+
     }
 }
