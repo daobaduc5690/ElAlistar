@@ -158,7 +158,7 @@ namespace ElAlistar
                 _q.CastOnUnit(target);
             }
 
-            var turrets = (from tower in ObjectManager.Get<Obj_Turret>()
+            /*var turrets = (from tower in ObjectManager.Get<Obj_Turret>()
                            where tower.IsAlly && !tower.IsDead && target.Distance(tower.Position) < 1500 && tower.Health > 0
                            select tower).ToList();
 
@@ -166,7 +166,7 @@ namespace ElAlistar
             {
                 _w.CastOnUnit(target);
                 Console.WriteLine("Can be in tower");
-            }
+            }*/
         }
 
         #endregion
