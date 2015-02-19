@@ -81,10 +81,10 @@ namespace ElAlistar
                 Harass();
             }
 
-            if (_menu.Item("AliSecActive").GetValue<KeyBind>().Active)
+           /* if (_menu.Item("AliSecActive").GetValue<KeyBind>().Active)
             {
                 AliSec();
-            }
+            }*/
 
             var target = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
             if (Interrupter2.IsCastingInterruptableSpell(target) &&
