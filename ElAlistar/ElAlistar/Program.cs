@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
+using SharpDX;
 using Color = System.Drawing.Color;
 
 namespace ElAlistar
@@ -34,7 +35,7 @@ namespace ElAlistar
             if (!Player.ChampionName.Equals(hero, StringComparison.CurrentCultureIgnoreCase))
                 return;
 
-            AddNotification("ElAlistar by jQuery v1.0.0.6");
+            AddNotification("ElAlistar by jQuery v1.0.0.7");
             AddNotification("Do you like mexican because I'll wrap you in my arms and make you my baerito.");
 
             #region Spell Data
@@ -80,6 +81,11 @@ namespace ElAlistar
                 Harass();
             }
 
+            if (_menu.Item("AliSecActive").GetValue<KeyBind>().Active)
+            {
+                AliSec();
+            }
+
             var target = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
             if (Interrupter2.IsCastingInterruptableSpell(target) &&
                 Interrupter2.GetInterruptableTargetData(target).DangerLevel == Interrupter2.DangerLevel.High &&
@@ -97,10 +103,8 @@ namespace ElAlistar
         private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender,
             Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (args.DangerLevel != Interrupter2.DangerLevel.High || sender.Distance(ObjectManager.Player) > _w.Range)
-            {
+            if (args.DangerLevel != Interrupter2.DangerLevel.Medium || sender.Distance(ObjectManager.Player) > _w.Range)
                 return;
-            }
 
             if (sender.IsValidTarget(_w.Range) && args.DangerLevel == Interrupter2.DangerLevel.High && _q.IsReady())
             {
@@ -143,6 +147,31 @@ namespace ElAlistar
             }
         }
 
+        /*private static void AliSec()
+        {
+            var pushDistance = 650;
+            var turretRange = 1000;
+
+            foreach (var k in ObjectManager.Player.Position.GetEnemiesInRange(650))
+            {
+                var pushPos = ObjectManager.Player.Position.Extend(k.Position,
+                    ObjectManager.Player.Position.Distance(k.Position) + pushDistance);
+                foreach (
+                    var t in
+                        ObjectManager.Get<Obj_Turret>()
+                            .Where(
+                                turret =>
+                                    turret.IsAlly && !turret.IsDead && turret.Health > 0 &&
+                                    turret.Position.Distance(ObjectManager.Player.Position) < 1500))
+                {
+                    if (t.Position.Distance(pushPos) < turretRange)
+                    {
+                        ObjectManager.Player.Spellbook.CastSpell(SpellSlot.W, k);
+                    }
+                }
+            }
+        }*/
+
         #region Harass
 
         private static void Harass()
@@ -156,17 +185,7 @@ namespace ElAlistar
             if (_menu.Item("HarassQ").GetValue<bool>() && _q.IsReady())
             {
                 _q.CastOnUnit(target);
-            }
-
-            /*var turrets = (from tower in ObjectManager.Get<Obj_Turret>()
-                           where tower.IsAlly && !tower.IsDead && target.Distance(tower.Position) < 1500 && tower.Health > 0
-                           select tower).ToList();
-
-            if (turrets.Any())
-            {
-                _w.CastOnUnit(target);
-                Console.WriteLine("Can be in tower");
-            }*/
+            } 
         }
 
         #endregion
@@ -334,6 +353,11 @@ namespace ElAlistar
             harassMenu.AddItem(new MenuItem("HarassQ", "[Harass] Use Q").SetValue(true));
             harassMenu.AddItem(new MenuItem("HarassActive", "Harass!").SetValue(new KeyBind("Z".ToCharArray()[0], KeyBindType.Press)));
 
+            // AliSec to tower
+            /*var aliSecMenu = _menu.AddSubMenu(new Menu("AliSec", "AliSec"));
+            aliSecMenu.AddItem(new MenuItem("AliSec", "[AliSec] Enemy to tower").SetValue(true));
+            aliSecMenu.AddItem(new MenuItem("AliSecActive", "AliSec to tower").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+            */
             //self healing
             var healMenu = _menu.AddSubMenu(new Menu("Heal settings", "SH"));
             healMenu.AddItem(new MenuItem("SelfHeal", "Auto heal yourself").SetValue(true));
@@ -344,7 +368,6 @@ namespace ElAlistar
             healMenu.AddItem(new MenuItem("minmanaE", "Min % mana for heal")).SetValue(new Slider(55));
 
             //Misc
-
             var miscMenu = _menu.AddSubMenu(new Menu("Drawings", "Misc"));
             miscMenu.AddItem(new MenuItem("Drawingsoff", "[Drawing] Drawings off").SetValue(false));
             miscMenu.AddItem(new MenuItem("DrawQ", "[Drawing] Draw Q").SetValue(true));
@@ -355,10 +378,15 @@ namespace ElAlistar
             //Interupt
             var interruptMenu = _menu.AddSubMenu(new Menu("Interrupt", "I"));
             interruptMenu.AddItem(new MenuItem("Interrupt", "Interrupt spells").SetValue(true));
+            interruptMenu.AddItem(new MenuItem("InterruptQ", "[Interrupt] Use Q").SetValue(true));
+            interruptMenu.AddItem(new MenuItem("InterruptW", "[Interrupt] Use W").SetValue(true));
 
-            //nigga who made this
+            //Here comes the moneyyy, money, money, moneyyyy
             var credits = _menu.AddSubMenu(new Menu("Credits", "jQuery"));
-            credits.AddItem(new MenuItem("Thanks", "By jQuery"));
+            credits.AddItem(new MenuItem("Thanks", "Powered by:"));
+            credits.AddItem(new MenuItem("jQuery", "jQuery"));
+            credits.AddItem(new MenuItem("Paypal", "Paypal:"));
+            credits.AddItem(new MenuItem("Email", "info@zavox.nl"));
 
             _menu.AddToMainMenu();
         }
