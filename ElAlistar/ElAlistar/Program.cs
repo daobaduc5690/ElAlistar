@@ -34,7 +34,7 @@ namespace ElAlistar
             if (!Player.ChampionName.Equals(hero, StringComparison.CurrentCultureIgnoreCase))
                 return;
 
-            AddNotification("ElAlistar by jQuery v1.0.0.5");
+            AddNotification("ElAlistar by jQuery v1.0.0.6");
             AddNotification("Do you like mexican because I'll wrap you in my arms and make you my baerito.");
 
             #region Spell Data
@@ -52,6 +52,7 @@ namespace ElAlistar
 
             //subscribe to event
             Game.OnGameUpdate += Game_OnGameUpdate;
+            Drawing.OnDraw += Drawing_OnDraw;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
 
@@ -61,6 +62,7 @@ namespace ElAlistar
             }
             catch (Exception ex) {}
         }
+
 
         #endregion
 
@@ -154,6 +156,16 @@ namespace ElAlistar
             if (_menu.Item("HarassQ").GetValue<bool>() && _q.IsReady())
             {
                 _q.CastOnUnit(target);
+            }
+
+            var turrets = (from tower in ObjectManager.Get<Obj_Turret>()
+                           where tower.IsAlly && !tower.IsDead && target.Distance(tower.Position) < 1500 && tower.Health > 0
+                           select tower).ToList();
+
+            if (turrets.Any())
+            {
+                _w.CastOnUnit(target);
+                Console.WriteLine("Can be in tower");
             }
         }
 
@@ -309,9 +321,9 @@ namespace ElAlistar
 
             //Combo
             var comboMenu = _menu.AddSubMenu(new Menu("Combo", "Combo"));
-            comboMenu.AddItem(new MenuItem("QCombo", "Use Q in combo").SetValue(true));
-            comboMenu.AddItem(new MenuItem("WCombo", "Use W in combo").SetValue(true));
-            comboMenu.AddItem(new MenuItem("RCombo", "Use R in combo").SetValue(true));
+            comboMenu.AddItem(new MenuItem("QCombo", "[Combo] Use Q").SetValue(true));
+            comboMenu.AddItem(new MenuItem("WCombo", "[Combo] Use W").SetValue(true));
+            comboMenu.AddItem(new MenuItem("RCombo", "[Combo] Use R").SetValue(true));
             comboMenu.AddItem(new MenuItem("UltHP", "Ult when health >= ").SetValue(new Slider(50, 1, 100)));
             comboMenu.AddItem(new MenuItem("rcount", "Use ult in combo if enemies >= ")).SetValue(new Slider(2, 1, 5));
             comboMenu.AddItem(new MenuItem("UseIgnite", "Use Ignite in combo when killable").SetValue(true));
@@ -319,7 +331,7 @@ namespace ElAlistar
 
             //Harass
             var harassMenu = _menu.AddSubMenu(new Menu("Harass", "H"));
-            harassMenu.AddItem(new MenuItem("HarassQ", "Use Q in harass").SetValue(true));
+            harassMenu.AddItem(new MenuItem("HarassQ", "[Harass] Use Q").SetValue(true));
             harassMenu.AddItem(new MenuItem("HarassActive", "Harass!").SetValue(new KeyBind("Z".ToCharArray()[0], KeyBindType.Press)));
 
             //self healing
@@ -330,6 +342,15 @@ namespace ElAlistar
             healMenu.AddItem(new MenuItem("HealAlly", "Auto heal ally's").SetValue(true));
             healMenu.AddItem(new MenuItem("HealAllyHP", "Heal ally at >= ").SetValue(new Slider(25, 1, 100)));
             healMenu.AddItem(new MenuItem("minmanaE", "Min % mana for heal")).SetValue(new Slider(55));
+
+            //Misc
+
+            var miscMenu = _menu.AddSubMenu(new Menu("Drawings", "Misc"));
+            miscMenu.AddItem(new MenuItem("Drawingsoff", "[Drawing] Drawings off").SetValue(false));
+            miscMenu.AddItem(new MenuItem("DrawQ", "[Drawing] Draw Q").SetValue(true));
+            miscMenu.AddItem(new MenuItem("DrawW", "[Drawing] Draw W").SetValue(true));
+            miscMenu.AddItem(new MenuItem("DrawE", "[Drawing] Draw E").SetValue(true));
+
 
             //Interupt
             var interruptMenu = _menu.AddSubMenu(new Menu("Interrupt", "I"));
@@ -344,6 +365,30 @@ namespace ElAlistar
 
         #endregion
 
+        #region Drawings
+
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+
+            if (_menu.Item("Drawingsoff").GetValue<bool>())
+                return;
+
+            if (_menu.Item("DrawQ").GetValue<bool>())
+                if (_q.Level > 0)
+                    Utility.DrawCircle(Player.Position, _q.Range, _q.IsReady() ? Color.Green : Color.Red);
+
+            if (_menu.Item("DrawW").GetValue<bool>())
+                if (_w.Level > 0)
+                    Utility.DrawCircle(Player.Position, _w.Range, _w.IsReady() ? Color.Green : Color.Red);
+
+            if (_menu.Item("DrawE").GetValue<bool>())
+                if (_e.Level > 0)
+                    Utility.DrawCircle(Player.Position, _e.Range, _e.IsReady() ? Color.Green : Color.Red);
+        }
+
+        #endregion
+
+        #region L33tIsGod
 
         /* maybe I should create a new class for this instead of writting it all down in the same damn file, yes maybe. But NO I WONT. */
         public static void AddNotification(String text)
@@ -352,5 +397,6 @@ namespace ElAlistar
             Notifications.AddNotification(notification);
         }
 
+        #endregion
     }
 }
